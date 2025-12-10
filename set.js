@@ -1,7 +1,6 @@
         // Supabase Configuration
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
-        
+const SUPABASE_URL = window.env?.SUPABASE_URL || 'fallback-url-if-needed';
+const SUPABASE_ANON_KEY = window.env?.SUPABASE_ANON_KEY || 'fallback-key';
         // Initialize Supabase client
         let supabase;
         
