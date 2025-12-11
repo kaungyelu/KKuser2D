@@ -6,7 +6,7 @@ const messages = [
     { text: "လွယ်ကူမြန်ဆန်စွာ လုပ်ဆောင်နိုင်ရန်", duration: 8000, type: "long" },
     { text: "KK-userမှာ ဖန်တီးထားခြင်းဖြစ်ပါသည်", duration: 9000, type: "long" },
     { text: "ယခု Webappအား အသုံးပြုရန်", duration: 7000, type: "medium" },
-    { text: "နှစ်သိန်းကျပ် (၂၀၀၀၀၀ကျပ်)တိတိ ကျသင့်ပါမည်", duration: 10000, type: "long" },
+    { text: "ငါးသိန်းကျပ် (၅၀၀၀၀၀ကျပ်)တိတိ ကျသင့်ပါမည်", duration: 10000, type: "long" },
     { text: "Server ကြေးပေးသွင်းရန်မှာ", duration: 7000, type: "medium" },
     { text: "အလုပ်ပေါ်မူတည်ပါတယ် Data မများပါက မလိုအပ်နိုင်", duration: 9000, type: "long" },
     { text: "လိုအပ်လာလျင်လည်း ပြောကြားပေးပါမည်", duration: 8000, type: "medium" }
