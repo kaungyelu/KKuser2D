@@ -1,10 +1,10 @@
 
 // စာရိုက်ပြမှုအတွက် - စာကြောင်းအလိုက် ကြာချိန်သတ်မှတ်
 const messages = [
-    { text: "မဂ်လာပါ ခင်ဗျာ", duration: 6000, type: "short" },
-    { text: "2Dစာရင်းအင်းများကို", duration: 7000, type: "medium" },
+    { text: "မဂ်လာပါ ခင်ဗျာ", duration: 5000, type: "short" },
+    { text: "2Dစာရင်းအင်းများကို", duration: 6000, type: "medium" },
     { text: "လွယ်ကူမြန်ဆန်စွာ လုပ်ဆောင်နိုင်ရန်", duration: 8000, type: "long" },
-    { text: "KK-userမှာ ဖန်တီးထားခြင်းဖြစ်ပါသည်", duration: 9000, type: "long" },
+    { text: "KK-user မှ ဖန်တီးထားခြင်းဖြစ်ပါသည်", duration: 9000, type: "long" },
     { text: "ယခု Webappအား အသုံးပြုရန်", duration: 7000, type: "medium" },
     { text: "သုံးသိန်းငါးသောင်း ကျပ် (၃၅၀၀၀၀ကျပ်)တိတိ ကျသင့်ပါမည်", duration: 10000, type: "long" },
     { text: "Server ကြေးပေးသွင်းရန်မှာ", duration: 7000, type: "medium" },
