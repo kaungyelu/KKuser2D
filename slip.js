@@ -644,13 +644,16 @@ function editBetItem(index) {
                 </div>
                 <div class="edit-bet-form">
                     <div class="edit-bet-input-group">
-                        <input type="text" 
+                        <input type="number" 
                                class="edit-bet-input" 
                                id="editBetNumber" 
                                placeholder="Number (00-99)" 
                                maxlength="2"
                                value="${formatNumber(bet.display || bet.num || bet.number)}">
-                        <input type="text" 
+</div>
+  <div class="edit-bet-input-group">
+
+                        <input type="number" 
                                class="edit-bet-input" 
                                id="editBetAmount" 
                                placeholder="Amount" 
