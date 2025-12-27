@@ -631,33 +631,46 @@ overflow-y: auto;
     <script src="buykeyboard.js"></script>
     
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const cptBtn = document.getElementById('cptBtn');
-            const inputRowDisplay = document.getElementById('inputRowDisplay');
-            const buttonsScrollContainer = document.getElementById('buttonsScrollContainer');
+    // DOMContentLoaded ကို မသုံးဘူး
+    function initKeyboard() {
+        const cptBtn = document.getElementById('cptBtn');
+        const inputRowDisplay = document.getElementById('inputRowDisplay');
+        const buttonsScrollContainer = document.getElementById('buttonsScrollContainer');
+        
+        if (!cptBtn) {
+            setTimeout(initKeyboard, 100);
+            return;
+        }
+        
+        let isKeyboardView = false;
+        
+        cptBtn.addEventListener('click', function() {
+            isKeyboardView = !isKeyboardView;
             
-            let isKeyboardView = false;
-            
-            cptBtn.addEventListener('click', function() {
-                isKeyboardView = !isKeyboardView;
-                
-                if (isKeyboardView) {
-                    cptBtn.textContent = 'Normal View';
-                    inputRowDisplay.style.display = 'flex';
-                    buttonsScrollContainer.style.display = 'block';
-                } else {
-                    cptBtn.textContent = 'Keyboard';
-                    inputRowDisplay.style.display = 'none';
-                    buttonsScrollContainer.style.display = 'none';
-                }
-            });
-            
-            // Initialize
-            cptBtn.textContent = 'Keyboard';
-            inputRowDisplay.style.display = 'none';
-            buttonsScrollContainer.style.display = 'none';
+            if (isKeyboardView) {
+                cptBtn.textContent = 'Normal View';
+                inputRowDisplay.style.display = 'flex';
+                buttonsScrollContainer.style.display = 'block';
+            } else {
+                cptBtn.textContent = 'Keyboard';
+                inputRowDisplay.style.display = 'none';
+                buttonsScrollContainer.style.display = 'none';
+            }
         });
-    </script>
+        
+        // Initialize
+        cptBtn.textContent = 'Keyboard';
+        inputRowDisplay.style.display = 'none';
+        buttonsScrollContainer.style.display = 'none';
+    }
+    
+    // defer သုံးပါ
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initKeyboard);
+    } else {
+        initKeyboard();
+    }
+</script>
 
     
 </body>
