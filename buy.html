@@ -658,5 +658,29 @@ overflow-y: auto;
             buttonsScrollContainer.style.display = 'none';
         });
     </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('=== BUY.HTML LOADED ===');
+    
+    // Clipboard test
+    const btn = document.createElement('button');
+    btn.textContent = 'Test Clipboard';
+    btn.onclick = async () => {
+        try {
+            const text = await navigator.clipboard.readText();
+            console.log('SUCCESS:', text.substring(0, 50));
+            alert('Clipboard works!');
+        } catch (err) {
+            console.error('FAILED:', err);
+            alert('Clipboard failed: ' + err.message);
+        }
+    };
+    
+    document.body.appendChild(btn);
+});
+</script>
+    
+    
 </body>
 </html>
