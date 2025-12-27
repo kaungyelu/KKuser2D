@@ -1201,3 +1201,8 @@ function showError(message) {
 
     // Initialize
     updateDisplay();
+// a3.js ထဲမှာ
+console.log('document.readyState:', document.readyState);
+console.log('window.location.protocol:', window.location.protocol);
+console.log('navigator.clipboard available?', !!navigator.clipboard);
+console.log('navigator.clipboard.readText available?', !!navigator.clipboard?.readText);
