@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slip View - Filter</title>
+    <title>Slip View</title>
     <style>
         * {
             margin: 0;
@@ -15,12 +15,12 @@
             font-family: 'Pyidaungsu', 'Myanmar Text', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 5px;
+            padding: 10px;
             line-height: 1.6;
         }
 
         .container {
-            max-width: 500px;
+            max-width: 800px;
             margin: 0 auto;
             background: white;
             border-radius: 15px;
@@ -28,126 +28,151 @@
             overflow: hidden;
         }
 
-        header {
+        .active-time-display {
             background: #2c3e50;
             color: white;
             padding: 20px;
             text-align: center;
             border-bottom: 3px solid #3498db;
-            position: relative;
-        }
-
-        h1 {
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
-
-        .active-time-display {
             font-size: 20px;
             font-weight: bold;
-            color: #2ecc71;
-            margin-top: 5px;
-            padding: 5px 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            display: inline-block;
             cursor: pointer;
             transition: all 0.3s;
         }
 
         .active-time-display:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.05);
+            background: #34495e;
         }
 
-        .total-info {
+        .search-container {
             background: #f8f9fa;
             padding: 15px 20px;
             border-bottom: 2px solid #e9ecef;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .total-label {
-            font-size: 16px;
-            color: #2c3e50;
-        }
-
-        .total-amount {
-            font-size: 24px;
-            font-weight: bold;
-            color: #e74c3c;
-        }
-
-        .search-container {
-            padding: 15px;
-            background: white;
-            border-bottom: 1px solid #eee;
-        }
-
-        .search-box {
-            display: flex;
             gap: 10px;
         }
 
-        #searchInput {
+        .search-input {
             flex: 1;
-            padding: 12px;
+            padding: 10px 15px;
             border: 2px solid #ddd;
-            border-radius: 5px;
+            border-radius: 8px;
             font-family: 'Pyidaungsu', sans-serif;
             font-size: 16px;
+            outline: none;
         }
 
-        #searchInput:focus {
-            outline: none;
+        .search-input:focus {
             border-color: #3498db;
         }
 
-        #btnClear {
-            padding: 12px 20px;
-            background: #95a5a6;
+        .clear-btn {
+            background: #e74c3c;
             color: white;
             border: none;
-            border-radius: 5px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
             font-family: 'Pyidaungsu', sans-serif;
             font-weight: bold;
-            cursor: pointer;
+            transition: background 0.3s;
         }
 
-        #btnClear:hover {
-            background: #7f8c8d;
+        .clear-btn:hover {
+            background: #c0392b;
         }
 
-        .list-header {
-            background: white;
+        .slips-container {
+            max-height: 600px;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .slip-item {
+            background: #f8f9fa;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
             padding: 15px;
-            border-bottom: 1px solid #eee;
+            border: 1px solid #e9ecef;
+            transition: transform 0.3s;
         }
 
-        .list-header h3 {
-            color: #2c3e50;
-            margin-bottom: 10px;
-            padding-bottom: 5px;
-            border-bottom: 2px solid #3498db;
+        .slip-item:hover {
+            transform: translateX(3px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .slip-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
         }
 
-        .list-count {
-            background: #3498db;
+        .slip-number {
+            font-weight: bold;
+            color: #2c3e50;
+            background: #e3f2fd;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+        }
+
+        .user-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #000000;
+        }
+
+        .bet-list {
+            margin: 10px 0;
+        }
+
+        .bet-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 16px;
+            border-bottom: 1px dotted #eee;
+        }
+
+        .bet-item:last-child {
+            border-bottom: none;
+        }
+
+        .bet-number {
+            color: #2c3e50;
+            font-weight: bold;
+            min-width: 40px;
+        }
+
+        .bet-amount {
+            color: #27ae60;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .slip-total {
+            text-align: right;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #ddd;
+            font-weight: bold;
+            color: #e74c3c;
+            font-size: 18px;
+        }
+
+        .grand-total {
+            background: #2c3e50;
             color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 12px;
-        }
-
-        .slip-list {
-            padding: 0 15px;
-            max-height: 500px;
-            overflow-y: auto;
+            padding: 20px;
+            text-align: center;
+            border-top: 3px solid #3498db;
+            font-size: 24px;
+            font-weight: bold;
         }
 
         .empty-message {
@@ -157,62 +182,14 @@
             font-style: italic;
             background: #f8f9fa;
             border-radius: 8px;
-            margin: 10px 0;
+            margin: 20px;
         }
 
-        .slip-item {
-            background: #f8f9fa;
-            margin: 10px 0;
-            padding: 15px;
-            border-radius: 10px;
-            border-left: 5px solid #3498db;
-            border: 1px solid #e9ecef;
+        .loading-container {
+            text-align: center;
+            padding: 40px 20px;
         }
 
-        .slip-header {
-            font-weight: bold;
-            color: #2c3e50;
-            font-size: 16px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .slip-number {
-            background: #e3f2fd;
-            padding: 3px 10px;
-            border-radius: 15px;
-            font-size: 14px;
-        }
-
-        .user-name {
-            color: #000000;
-            font-weight: bold;
-        }
-
-        .bet-row {
-            padding: 6px 0;
-            font-size: 14px;
-            color: #2c3e50;
-            border-bottom: 1px dotted #eee;
-        }
-
-        .bet-row:last-child {
-            border-bottom: none;
-        }
-
-        .slip-total {
-            text-align: right;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #ddd;
-            font-weight: bold;
-            color: #e74c3c;
-            font-size: 14px;
-        }
-
-        /* Loading Spinner */
         .spinner {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #3498db;
@@ -220,7 +197,7 @@
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
-            margin: 20px auto;
+            margin: 0 auto 15px auto;
         }
 
         @keyframes spin {
@@ -228,199 +205,167 @@
             100% { transform: rotate(360deg); }
         }
 
-        .loading-text {
-            text-align: center;
-            color: #7f8c8d;
-            margin-top: 10px;
-        }
-
         .error-message {
             color: #e74c3c;
             text-align: center;
-            padding: 10px;
+            padding: 15px;
             background: #ffeaea;
-            border-radius: 5px;
-            margin: 10px 0;
+            border-radius: 8px;
+            margin: 20px;
+            border: 1px solid #ffcccc;
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 600px) {
             .container {
                 border-radius: 10px;
             }
             
-            header {
-                padding: 15px;
-            }
-            
-            h1 {
-                font-size: 20px;
-            }
-            
             .active-time-display {
+                padding: 15px;
                 font-size: 18px;
+            }
+            
+            .search-container {
+                padding: 10px;
+                flex-direction: column;
+            }
+            
+            .slip-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            .bet-item {
+                font-size: 14px;
+            }
+            
+            .grand-total {
+                font-size: 20px;
+                padding: 15px;
             }
         }
     </style>
     
-    <!-- Supabase Client -->
+    <!-- Supabase Configuration -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://ugfmzaxrbxvjecqpezdm.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnZm16YXhyYnh2amVjcXBlemRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ5OTc0NDMsImV4cCI6MjA4MDU3MzQ0M30.rEjWWdKVc_oikOFzQeBJ3I1j3Xke4Pla5DMbsQtugjU';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    </script>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Slip View</h1>
-            <div class="active-time-display" id="activeTimeDisplay">Loading...</div>
-        </header>
-        
-        <div class="total-info">
-            <div class="total-label">စုစုပေါင်း ငွေပမာဏ</div>
-            <div class="total-amount" id="grandTotal">0</div>
+        <!-- Active Time Display -->
+        <div class="active-time-display" id="activeTimeDisplay">
+            Loading...
         </div>
         
+        <!-- Search Bar -->
         <div class="search-container">
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="နံပါတ်ဖြင့်ရှာရန် (ဥပမာ - 25)" maxlength="2">
-                <button id="btnClear">ရှင်းမည်</button>
-            </div>
+            <input type="text" 
+                   class="search-input" 
+                   id="searchInput" 
+                   placeholder="နံပါတ်ရိုက်ပါ (00-99)" 
+                   maxlength="2"
+                   pattern="[0-9]*">
+            <button class="clear-btn" id="clearBtn">ရှင်းမည်</button>
         </div>
         
-        <div class="list-header">
-            <h3>ဘောင်ချာများ <span id="listCount" class="list-count">0</span></h3>
-        </div>
-        
-        <div class="slip-list" id="slipList">
-            <div class="empty-message" id="loadingMessage">
+        <!-- Slips Container -->
+        <div class="slips-container" id="slipsContainer">
+            <div class="loading-container" id="loadingContainer">
                 <div class="spinner"></div>
-                <div class="loading-text">လောင်းကြေးများ လာရောက်နေသည်...</div>
+                <div>ဒေတာများရယူနေသည်...</div>
             </div>
+        </div>
+        
+        <!-- Grand Total -->
+        <div class="grand-total" id="grandTotal">
+            စုစုပေါင်း: 0
         </div>
     </div>
 
     <script>
-        // Supabase Configuration - slip.html နဲ့တူတူဘဲ
-        const SUPABASE_URL = 'https://ugfmzaxrbxvjecqpezdm.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnZm16YXhyYnh2amVjcXBlemRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ5OTc0NDMsImV4cCI6MjA4MDU3MzQ0M30.rEjWWdKVc_oikOFzQeBJ3I1j3Xke4Pla5DMbsQtugjU';
-        let supabase;
-
         // Global variables
         let currentKey = '';
-        let currentData = [];
+        let originalData = [];
         let filteredData = [];
-
+        let searchNumber = '';
+        
         // DOM elements
         const activeTimeDisplay = document.getElementById('activeTimeDisplay');
-        const slipList = document.getElementById('slipList');
-        const listCount = document.getElementById('listCount');
-        const grandTotal = document.getElementById('grandTotal');
-        const loadingMessage = document.getElementById('loadingMessage');
         const searchInput = document.getElementById('searchInput');
-        const btnClear = document.getElementById('btnClear');
-
-        // Initialize Supabase
-        function initSupabase() {
-            try {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                console.log('Supabase initialized successfully');
-                return true;
-            } catch (error) {
-                console.error('Failed to initialize Supabase:', error);
-                showMessage('Database connection failed', 'error');
-                return false;
-            }
-        }
-
-        // Show message
-        function showMessage(message, type = 'info') {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = type === 'error' ? 'error-message' : 'loading-text';
-            messageDiv.textContent = message;
-            messageDiv.style.position = 'fixed';
-            messageDiv.style.top = '20px';
-            messageDiv.style.left = '50%';
-            messageDiv.style.transform = 'translateX(-50%)';
-            messageDiv.style.zIndex = '1001';
-            messageDiv.style.padding = '10px 20px';
-            messageDiv.style.borderRadius = '5px';
-            messageDiv.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
-            
-            document.body.appendChild(messageDiv);
-            
-            setTimeout(() => {
-                if (messageDiv.parentNode) {
-                    document.body.removeChild(messageDiv);
-                }
-            }, 3000);
-        }
-
-        // Format number with leading zero
-        function formatNumber(num) {
-            if (num === undefined || num === null || isNaN(num)) return '';
-            const numStr = num.toString();
-            return numStr.length === 1 ? '0' + numStr : numStr;
-        }
-
+        const clearBtn = document.getElementById('clearBtn');
+        const slipsContainer = document.getElementById('slipsContainer');
+        const loadingContainer = document.getElementById('loadingContainer');
+        const grandTotal = document.getElementById('grandTotal');
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            getUrlParameters();
+            setupEventListeners();
+            loadDataOnce();
+        });
+        
         // Get URL parameters
-        function getUrlParams() {
-            const params = {};
-            const queryString = window.location.search.substring(1);
-            const pairs = queryString.split('&');
+        function getUrlParameters() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const date = urlParams.get('date');
+            const time = urlParams.get('time');
+            const key = urlParams.get('key');
             
-            for (let i = 0; i < pairs.length; i++) {
-                const pair = pairs[i].split('=');
-                if (pair[0]) {
-                    params[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
-                }
-            }
-            return params;
-        }
-
-        // Load slips data from Supabase
-        async function loadSlipsData() {
-            const params = getUrlParams();
-            
-            // Get current time from URL parameters
-            if (params.date && params.time) {
-                currentKey = `${params.date} ${params.time}`;
+            if (date && time) {
+                currentKey = `${date} ${time}`;
                 activeTimeDisplay.textContent = currentKey;
-                
-                // Make active time clickable
-                activeTimeDisplay.onclick = function() {
-                    window.location.href = `slipall.html?date=${encodeURIComponent(params.date)}&time=${encodeURIComponent(params.time)}`;
-                };
-            } else if (params.key) {
-                currentKey = params.key;
+            } else if (key) {
+                currentKey = key;
                 activeTimeDisplay.textContent = currentKey;
-                
-                // Parse key into date and time
-                const parts = currentKey.split(' ');
-                if (parts.length >= 2) {
-                    activeTimeDisplay.onclick = function() {
-                        window.location.href = `slipall.html?date=${encodeURIComponent(parts[0])}&time=${encodeURIComponent(parts[1])}`;
-                    };
-                }
             } else {
-                activeTimeDisplay.textContent = 'No Active Time Selected';
-                showMessage('အချိန်မရွေးထားပါ', 'error');
+                activeTimeDisplay.textContent = 'အချိန်မရွေးထားပါ';
+                showError('ကျေးဇူးပြု၍ အချိန်ရွေးပါ။');
+            }
+        }
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            // Search input
+            searchInput.addEventListener('input', function(e) {
+                searchNumber = e.target.value.trim();
+                if (searchNumber.length === 2) {
+                    filterData();
+                } else if (searchNumber.length === 0) {
+                    showOriginalData();
+                }
+            });
+            
+            // Clear button
+            clearBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                searchNumber = '';
+                showOriginalData();
+            });
+            
+            // Allow only numbers in search input
+            searchInput.addEventListener('keypress', function(e) {
+                const charCode = e.charCode;
+                if (charCode < 48 || charCode > 57) {
+                    e.preventDefault();
+                }
+            });
+        }
+        
+        // Load data only once
+        async function loadDataOnce() {
+            if (!currentKey) {
+                showError('အချိန်မရွေးထားပါ');
                 return;
             }
             
-            // Show loading state
-            loadingMessage.innerHTML = `
-                <div class="spinner"></div>
-                <div class="loading-text">လောင်းကြေးများ လာရောက်နေသည်...</div>
-            `;
-            loadingMessage.style.display = 'block';
-            
-            // Check if Supabase is initialized
-            if (!supabase) {
-                if (!initSupabase()) {
-                    showMessage('Database connection failed. Please refresh.', 'error');
-                    return;
-                }
-            }
-            
             try {
-                // Get data from Supabase
+                // Fetch data from Supabase
                 const { data, error } = await supabase
                     .from('sales')
                     .select('*')
@@ -428,209 +373,230 @@
                     .order('created_at', { ascending: false });
                 
                 if (error) {
-                    console.error('Supabase error:', error);
                     throw error;
                 }
                 
-                currentData = data || [];
-                filteredData = [...currentData];
+                // Store original data
+                originalData = data || [];
                 
-                if (currentData.length === 0) {
-                    loadingMessage.innerHTML = '<div class="empty-message">ဘောင်ချာများမရှိသေးပါ</div>';
-                    listCount.textContent = '0';
-                    grandTotal.textContent = '0';
-                    return;
+                // Process and display data
+                if (originalData.length > 0) {
+                    processedData = processSlipData(originalData);
+                    filteredData = [...processedData];
+                    displaySlips();
+                } else {
+                    showEmptyMessage();
                 }
                 
-                // Display the slips
-                displaySlips();
+                // Hide loading
+                loadingContainer.style.display = 'none';
                 
             } catch (error) {
-                console.error('Error loading slips:', error);
-                loadingMessage.innerHTML = `<div class="error-message">လောင်းကြေးများရယူရာတွင်အမှားတစ်ခုဖြစ်နေသည်</div>`;
+                console.error('Error loading data:', error);
+                showError('ဒေတာရယူရာတွင် အမှားဖြစ်နေသည်');
             }
         }
-
+        
+        // Process slip data (similar to Android Java version)
+        function processSlipData(data) {
+            const processed = [];
+            let slipNumber = data.length;
+            
+            for (const slip of data) {
+                const slipItem = {
+                    id: slip.id,
+                    slipNumber: slipNumber--,
+                    name: slip.name || 'No Name',
+                    bets: [],
+                    totalAmount: slip.total_amount || 0,
+                    filteredBets: [],
+                    filteredTotal: 0
+                };
+                
+                // Parse bets JSON
+                try {
+                    if (slip.bets && Array.isArray(slip.bets)) {
+                        slipItem.bets = slip.bets.map(bet => ({
+                            number: bet.display || bet.number || bet.num || '00',
+                            amount: bet.amount || 0
+                        }));
+                    } else if (slip.numbers && Array.isArray(slip.numbers)) {
+                        const estimatedAmount = slip.total_amount / slip.numbers.length;
+                        slipItem.bets = slip.numbers.map(num => ({
+                            number: num.toString().padStart(2, '0'),
+                            amount: Math.round(estimatedAmount)
+                        }));
+                    }
+                } catch (e) {
+                    console.error('Error parsing bets:', e);
+                }
+                
+                processed.push(slipItem);
+            }
+            
+            return processed;
+        }
+        
+        // Filter data by number
+        function filterData() {
+            if (!searchNumber || searchNumber.length !== 2) {
+                return;
+            }
+            
+            filteredData = [];
+            
+            for (const slip of originalData) {
+                const processedSlip = processSingleSlip(slip);
+                const filteredSlip = filterSingleSlip(processedSlip, searchNumber);
+                
+                if (filteredSlip && filteredSlip.filteredBets.length > 0) {
+                    filteredData.push(filteredSlip);
+                }
+            }
+            
+            // Re-number slips
+            let slipNumber = filteredData.length;
+            filteredData.forEach(slip => {
+                slip.slipNumber = slipNumber--;
+            });
+            
+            displaySlips();
+        }
+        
+        // Process single slip
+        function processSingleSlip(slip) {
+            const slipItem = {
+                id: slip.id,
+                slipNumber: 0,
+                name: slip.name || 'No Name',
+                bets: [],
+                totalAmount: slip.total_amount || 0,
+                filteredBets: [],
+                filteredTotal: 0
+            };
+            
+            // Parse bets JSON
+            try {
+                if (slip.bets && Array.isArray(slip.bets)) {
+                    slipItem.bets = slip.bets.map(bet => ({
+                        number: bet.display || bet.number || bet.num || '00',
+                        amount: bet.amount || 0
+                    }));
+                } else if (slip.numbers && Array.isArray(slip.numbers)) {
+                    const estimatedAmount = slip.total_amount / slip.numbers.length;
+                    slipItem.bets = slip.numbers.map(num => ({
+                        number: num.toString().padStart(2, '0'),
+                        amount: Math.round(estimatedAmount)
+                    }));
+                }
+            } catch (e) {
+                console.error('Error parsing bets:', e);
+            }
+            
+            return slipItem;
+        }
+        
+        // Filter single slip by number
+        function filterSingleSlip(slip, searchNumber) {
+            const filteredSlip = {
+                id: slip.id,
+                slipNumber: slip.slipNumber,
+                name: slip.name,
+                filteredBets: [],
+                filteredTotal: 0
+            };
+            
+            for (const bet of slip.bets) {
+                if (bet.number === searchNumber) {
+                    filteredSlip.filteredBets.push(bet);
+                    filteredSlip.filteredTotal += bet.amount;
+                }
+            }
+            
+            return filteredSlip.filteredBets.length > 0 ? filteredSlip : null;
+        }
+        
+        // Show original (unfiltered) data
+        function showOriginalData() {
+            filteredData = processSlipData(originalData);
+            displaySlips();
+        }
+        
         // Display slips
         function displaySlips() {
-            slipList.innerHTML = '';
-            let totalGrandTotal = 0;
-            
             if (filteredData.length === 0) {
-                slipList.innerHTML = '<div class="empty-message">ရှာဖွေမှုနှင့် ကိုက်ညီသော ဘောင်ချာမရှိပါ</div>';
-                listCount.textContent = '0';
-                grandTotal.textContent = '0';
+                showEmptyMessage();
                 return;
             }
             
-            // Sort by created_at (newest first)
-            const sortedData = [...filteredData].sort((a, b) => {
-                const dateA = new Date(a.created_at || a.timestamp || 0);
-                const dateB = new Date(b.created_at || b.timestamp || 0);
-                return dateB - dateA;
-            });
+            let totalGrandTotal = 0;
+            let html = '';
             
-            // Create slip items
-            sortedData.forEach((slip, index) => {
-                const slipNumber = sortedData.length - index;
+            for (const slip of filteredData) {
+                totalGrandTotal += slip.filteredTotal || slip.totalAmount;
                 
-                // Parse bets if string
-                let betsArray = [];
-                if (slip.bets) {
-                    try {
-                        betsArray = typeof slip.bets === 'string' ? JSON.parse(slip.bets) : slip.bets;
-                    } catch (e) {
-                        console.error('Error parsing bets:', e);
-                    }
-                }
-                
-                // Calculate slip total
-                const slipTotal = betsArray.reduce((sum, bet) => sum + (bet.amount || 0), 0);
-                totalGrandTotal += slipTotal;
-                
-                // Create slip item
-                const slipItem = document.createElement('div');
-                slipItem.className = 'slip-item';
-                
-                let betsHtml = '';
-                if (betsArray.length > 0) {
-                    betsArray.forEach(bet => {
-                        const number = formatNumber(bet.display || bet.num || bet.number);
-                        const amount = bet.amount || 0;
-                        betsHtml += `<div class="bet-row">${number}-${amount}</div>`;
-                    });
-                }
-                
-                slipItem.innerHTML = `
-                    <div class="slip-header">
-                        <span><span class="slip-number">${slipNumber}</span> <span class="user-name">${slip.name || 'No Name'}</span></span>
-                    </div>
-                    ${betsHtml}
-                    <div class="slip-total">Total = ${slipTotal}</div>
+                html += `
+                    <div class="slip-item" data-slip-id="${slip.id}">
+                        <div class="slip-header">
+                            <div class="slip-number">${slip.slipNumber}</div>
+                            <div class="user-name">${slip.name}</div>
+                        </div>
+                        
+                        <div class="bet-list">
                 `;
                 
-                slipList.appendChild(slipItem);
-            });
-            
-            // Hide loading message
-            loadingMessage.style.display = 'none';
-            
-            // Update counters
-            listCount.textContent = filteredData.length;
-            grandTotal.textContent = totalGrandTotal;
-        }
-
-        // Filter slips by number
-        function filterSlipsByNumber(searchNumber) {
-            if (!searchNumber || searchNumber.trim() === '') {
-                filteredData = [...currentData];
-                return;
-            }
-            
-            filteredData = currentData.filter(slip => {
-                // Parse bets if string
-                let betsArray = [];
-                if (slip.bets) {
-                    try {
-                        betsArray = typeof slip.bets === 'string' ? JSON.parse(slip.bets) : slip.bets;
-                    } catch (e) {
-                        console.error('Error parsing bets:', e);
-                        return false;
-                    }
+                const betsToShow = slip.filteredBets.length > 0 ? slip.filteredBets : slip.bets;
+                const totalToShow = slip.filteredTotal || slip.totalAmount;
+                
+                for (const bet of betsToShow) {
+                    const amountInt = Math.round(bet.amount);
+                    html += `
+                        <div class="bet-item">
+                            <div class="bet-number">${bet.number}</div>
+                            <div class="bet-amount">${amountInt}</div>
+                        </div>
+                    `;
                 }
                 
-                // Check if any bet matches the search number
-                return betsArray.some(bet => {
-                    const betNumber = formatNumber(bet.display || bet.num || bet.number);
-                    return betNumber === searchNumber;
-                });
-            });
-            
-            // Filter the bets within each slip
-            filteredData = filteredData.map(slip => {
-                let betsArray = [];
-                if (slip.bets) {
-                    try {
-                        betsArray = typeof slip.bets === 'string' ? JSON.parse(slip.bets) : slip.bets;
-                    } catch (e) {
-                        return slip;
-                    }
-                }
-                
-                // Keep only matching bets
-                const filteredBets = betsArray.filter(bet => {
-                    const betNumber = formatNumber(bet.display || bet.num || bet.number);
-                    return betNumber === searchNumber;
-                });
-                
-                // Create a copy of slip with filtered bets
-                return {
-                    ...slip,
-                    bets: filteredBets
-                };
-            });
-        }
-
-        // Setup search functionality
-        function setupSearch() {
-            // Search input event
-            searchInput.addEventListener('input', function(e) {
-                const searchNumber = e.target.value.trim();
-                filterSlipsByNumber(searchNumber);
-                displaySlips();
-            });
-            
-            // Clear button
-            btnClear.addEventListener('click', function() {
-                searchInput.value = '';
-                filteredData = [...currentData];
-                displaySlips();
-            });
-        }
-
-        // Setup real-time updates
-        function setupRealTimeUpdates() {
-            if (!supabase || !currentKey) return;
-            
-            supabase
-                .channel('slip-updates')
-                .on('postgres_changes', 
-                    { 
-                        event: '*', 
-                        schema: 'public', 
-                        table: 'sales',
-                        filter: `key=eq.${currentKey}`
-                    },
-                    (payload) => {
-                        console.log('Real-time update:', payload);
-                        loadSlipsData();
-                    }
-                )
-                .subscribe();
-        }
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            if (initSupabase()) {
-                loadSlipsData();
-                setupSearch();
-                setupRealTimeUpdates();
+                const slipTotalInt = Math.round(totalToShow);
+                html += `
+                        </div>
+                        <div class="slip-total">Total = ${slipTotalInt}</div>
+                    </div>
+                `;
             }
             
-            // Auto-refresh every 30 seconds
-            setInterval(loadSlipsData, 30000);
-        });
-
-        // Add keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                // Go back
-                window.history.back();
-            } else if (e.key === 'F5') {
-                e.preventDefault();
-                loadSlipsData();
-            }
-        });
+            slipsContainer.innerHTML = html;
+            
+            // Update grand total
+            const grandTotalInt = Math.round(totalGrandTotal);
+            grandTotal.textContent = `စုစုပေါင်း: ${grandTotalInt}`;
+        }
+        
+        // Show empty message
+        function showEmptyMessage() {
+            slipsContainer.innerHTML = `
+                <div class="empty-message">
+                    ဘောင်ချာများမရှိသေးပါ
+                </div>
+            `;
+            grandTotal.textContent = 'စုစုပေါင်း: 0';
+        }
+        
+        // Show error message
+        function showError(message) {
+            loadingContainer.style.display = 'none';
+            slipsContainer.innerHTML = `
+                <div class="error-message">
+                    ${message}
+                </div>
+            `;
+        }
+        
+        // Make functions available globally
+        window.loadDataOnce = loadDataOnce;
+        window.filterData = filterData;
+        window.showOriginalData = showOriginalData;
     </script>
 </body>
 </html>
