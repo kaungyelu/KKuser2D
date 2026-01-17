@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slip All View</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Pyidaungsu', sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding: 10px;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            background: #667eea;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .active-time {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+            padding: 12px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+        }
+        
+        .slips-container {
+            padding: 15px;
+        }
+        
+        .slip-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+        }
+        
+        .slip-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .bet-row {
+            padding: 6px 10px;
+            color: #2c3e50;
+            font-size: 16px;
+            border-bottom: 1px dotted #eee;
+        }
+        
+        .bet-row:last-child {
+            border-bottom: none;
+        }
+        
+        .slip-total {
+            text-align: right;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 2px solid #667eea;
+            font-size: 16px;
+        }
+        
+        .grand-total {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 20px;
+            border-radius: 0 0 10px 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Slip All View</h2>
+            <div class="active-time" id="activeTimeDisplay">
+                2024-03-15 10:30 AM
+            </div>
+        </div>
+        
+        <div class="slips-container" id="slipsContainer">
+            <!-- Slips will be loaded here -->
+        </div>
+        
+        <div class="grand-total" id="grandTotal">
+            All Total: 0
+        </div>
+    </div>
+
+    <script>
+        // SlipAllActivity.java logic in JavaScript
+        function loadSlipsData() {
+            // URL ကနေ parameters ယူ
+            const urlParams = new URLSearchParams(window.location.search);
+            const date = urlParams.get('date');
+            const time = urlParams.get('time');
+            
+            if (date && time) {
+                document.getElementById('activeTimeDisplay').textContent = date + ' ' + time;
+            }
+            
+            // Supabase ကနေ data ယူ (သို့) localStorage ကနေ
+            try {
+                const savedData = localStorage.getItem('slipsData');
+                if (savedData) {
+                    const slipsData = JSON.parse(savedData);
+                    displaySlips(slipsData);
+                }
+            } catch (e) {
+                console.error('Error loading data:', e);
+            }
+        }
+        
+        function displaySlips(data) {
+            const container = document.getElementById('slipsContainer');
+            let grandTotal = 0;
+            
+            container.innerHTML = '';
+            
+            // Sort by slip number (reverse)
+            const sortedData = [...data].sort((a, b) => b.id - a.id);
+            
+            sortedData.forEach((slip, index) => {
+                const slipNumber = sortedData.length - index;
+                
+                const slipDiv = document.createElement('div');
+                slipDiv.className = 'slip-item';
+                
+                let betsHtml = '';
+                let slipTotal = 0;
+                
+                if (slip.bets && slip.bets.length > 0) {
+                    slip.bets.forEach(bet => {
+                        betsHtml += `<div class="bet-row">${bet.number} ${bet.amount}</div>`;
+                        slipTotal += bet.amount;
+                    });
+                }
+                
+                slipDiv.innerHTML = `
+                    <div class="slip-header">${slipNumber} ${slip.name}</div>
+                    ${betsHtml}
+                    <div class="slip-total">Total: ${slipTotal}</div>
+                `;
+                
+                container.appendChild(slipDiv);
+                grandTotal += slipTotal;
+            });
+            
+            if (sortedData.length > 1) {
+                document.getElementById('grandTotal').textContent = `All Total: ${grandTotal}`;
+            } else {
+                document.getElementById('grandTotal').style.display = 'none';
+            }
+        }
+        
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', loadSlipsData);
+    </script>
+</body>
+</html>
