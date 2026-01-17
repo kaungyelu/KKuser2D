@@ -100,8 +100,6 @@ function makeHeaderClickable() {
     // Add tooltip
     header.title = "Slip View စာမျက်နှာသို့ သွားရန် နှိပ်ပါ";
     
-    // Change text to indicate it's clickable
-    header.innerHTML = `📄 ${originalText} <span style="font-size: 14px; color: #666;">(Click to view details)</span>`;
 }
 
 // Wait for DOM to be fully loaded
