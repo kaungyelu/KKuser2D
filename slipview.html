@@ -269,32 +269,6 @@
             border-radius: 8px;
         }
 
-        .notification {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 10px 20px;
-            border-radius: 5px;
-            background: #3498db;
-            color: white;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            animation: slideDown 0.3s ease-out;
-            display: none;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateX(-50%) translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
-        }
-
         @media (max-width: 480px) {
             .container {
                 border-radius: 10px;
@@ -326,9 +300,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <!-- Notification -->
-    <div class="notification" id="notification"></div>
-
     <div class="container">
         <!-- Active Time Section -->
         <div class="active-time-section">
@@ -369,17 +340,64 @@
         </div>
     </div>
 
-    <!-- Supabase Configuration Script -->
+    <!-- Script 1: Supabase Configuration -->
     <script>
-        // Supabase Configuration - EXACTLY as in slip.html
+        // Supabase Configuration (EXACTLY as slip.html)
         const SUPABASE_URL = 'https://ugfmzaxrbxvjecqpezdm.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnZm16YXhyYnh2amVjcXBlemRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ5OTc0NDMsImV4cCI6MjA4MDU3MzQ0M30.rEjWWdKVc_oikOFzQeBJ3I1j3Xke4Pla5DMbsQtugjU';
         window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     </script>
 
-    <!-- Main Application Script -->
+    <!-- Script 2: Main Application Logic -->
     <script>
-        // Initialize Supabase EXACTLY as in slip.html
+        // Global Variables
+        
+        let currentKey = '';
+        let allSalesData = [];
+        let filteredSalesData = [];
+        let searchNumber = '';
+
+        // DOM Elements
+        const activeTimeDisplay = document.getElementById('activeTimeDisplay');
+        const searchInput = document.getElementById('searchInput');
+        const clearBtn = document.getElementById('clearBtn');
+        const searchStatus = document.getElementById('searchStatus');
+        const dataSection = document.getElementById('dataSection');
+        const loadingContainer = document.getElementById('loadingContainer');
+        const grandTotal = document.getElementById('grandTotal');
+
+        // Function to show message (EXACTLY as slip.html style)
+        function showMessage(message, type = 'info') {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type === 'error' ? 'error-message' : 'loading-text';
+            messageDiv.textContent = message;
+            messageDiv.style.position = 'fixed';
+            messageDiv.style.top = '20px';
+            messageDiv.style.left = '50%';
+            messageDiv.style.transform = 'translateX(-50%)';
+            messageDiv.style.zIndex = '1001';
+            messageDiv.style.padding = '10px 20px';
+            messageDiv.style.borderRadius = '5px';
+            messageDiv.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+            
+            if (type === 'error') {
+                messageDiv.style.background = '#ffeaea';
+                messageDiv.style.color = '#e74c3c';
+            } else {
+                messageDiv.style.background = '#eaffea';
+                messageDiv.style.color = '#27ae60';
+            }
+            
+            document.body.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    document.body.removeChild(messageDiv);
+                }
+            }, 3000);
+        }
+
+        // Initialize Supabase (EXACTLY as slip.html)
         function initSupabase() {
             try {
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -392,36 +410,7 @@
             }
         }
 
-        // DOM Elements
-        const activeTimeDisplay = document.getElementById('activeTimeDisplay');
-        const searchInput = document.getElementById('searchInput');
-        const clearBtn = document.getElementById('clearBtn');
-        const searchStatus = document.getElementById('searchStatus');
-        const dataSection = document.getElementById('dataSection');
-        const loadingContainer = document.getElementById('loadingContainer');
-        const grandTotal = document.getElementById('grandTotal');
-        const notification = document.getElementById('notification');
-        
-        // Global Variables
-        let currentKey = '';
-        let allSalesData = [];
-        let filteredSalesData = [];
-        let searchNumber = '';
-        let supabase; // Will be initialized
-        
-        // Function to show message EXACTLY as in slip.html
-        function showMessage(message, type = 'info') {
-            notification.textContent = message;
-            notification.style.background = type === 'error' ? '#e74c3c' : 
-                                           type === 'success' ? '#2ecc71' : '#3498db';
-            notification.style.display = 'block';
-            
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 3000);
-        }
-        
-        // Function to get URL parameters EXACTLY as in slip.html
+        // Function to get URL parameters (EXACTLY as slip.html)
         function getUrlParams() {
             const params = {};
             const queryString = window.location.search.substring(1);
@@ -435,197 +424,19 @@
             }
             return params;
         }
-        
-        // Function to format number with leading zero EXACTLY as in slip.html
+
+        // Function to format number with leading zero (EXACTLY as slip.html)
         function formatNumber(num) {
             if (num === undefined || num === null || isNaN(num)) return '';
             const numStr = num.toString();
             return numStr.length === 1 ? '0' + numStr : numStr;
         }
-        
-        // Function to filter data by search number
-        function filterDataByNumber(data, searchNum) {
-            if (!searchNum || searchNum === '') {
-                return data;
-            }
-            
-            const filteredData = [];
-            const searchNumInt = parseInt(searchNum);
-            
-            data.forEach(slip => {
-                // Check if this slip has the searched number
-                let hasMatchingBets = false;
-                const matchingBets = [];
-                
-                // Process bets array EXACTLY as in slip.html
-                if (slip.bets && Array.isArray(slip.bets)) {
-                    slip.bets.forEach(bet => {
-                        // Get number from bet object EXACTLY as in slip.html
-                        const betNumber = bet.display || bet.num || bet.number;
-                        if (parseInt(betNumber) === searchNumInt) {
-                            hasMatchingBets = true;
-                            // Keep the exact bet object structure
-                            matchingBets.push({
-                                display: formatNumber(betNumber),
-                                num: parseInt(betNumber),
-                                number: parseInt(betNumber),
-                                amount: bet.amount || 0
-                            });
-                        }
-                    });
-                } else if (slip.numbers && Array.isArray(slip.numbers)) {
-                    // Fallback to numbers array EXACTLY as in slip.html
-                    slip.numbers.forEach(num => {
-                        if (parseInt(num) === searchNumInt) {
-                            hasMatchingBets = true;
-                            // Estimate amount if not available
-                            const estimatedAmount = slip.total_amount / slip.numbers.length;
-                            matchingBets.push({
-                                display: formatNumber(num),
-                                num: parseInt(num),
-                                number: parseInt(num),
-                                amount: Math.round(estimatedAmount)
-                            });
-                        }
-                    });
-                }
-                
-                if (hasMatchingBets && matchingBets.length > 0) {
-                    // Create a copy of the slip with only matching bets
-                    const filteredSlip = {
-                        id: slip.id,
-                        name: slip.name,
-                        key: slip.key,
-                        bets: matchingBets,
-                        numbers: matchingBets.map(bet => bet.num),
-                        total_amount: matchingBets.reduce((sum, bet) => sum + (bet.amount || 0), 0),
-                        total: matchingBets.reduce((sum, bet) => sum + (bet.amount || 0), 0),
-                        created_at: slip.created_at,
-                        timestamp: slip.timestamp,
-                        com: slip.com || 0,
-                        za: slip.za || 0
-                    };
-                    filteredData.push(filteredSlip);
-                }
-            });
-            
-            return filteredData;
-        }
-        
-        // Function to calculate grand total
-        function calculateGrandTotal(data) {
-            return data.reduce((total, slip) => total + (slip.total_amount || slip.total || 0), 0);
-        }
-        
-        // Function to create slip item HTML
-        function createSlipItem(slip, index, totalItems) {
-            // Slip number: newest gets highest number (reverse of array index)
-            const slipNumber = totalItems - index;
-            const userName = slip.name || 'No Name';
-            const slipTotal = slip.total_amount || slip.total || 0;
-            
-            let betRows = '';
-            
-            // Process bets EXACTLY as in slip.html
-            if (slip.bets && slip.bets.length > 0) {
-                slip.bets.forEach(bet => {
-                    // Get display number EXACTLY as in slip.html
-                    const displayNum = formatNumber(bet.display || bet.num || bet.number);
-                    const amount = bet.amount || 0;
-                    
-                    betRows += `
-                        <div class="bet-row">
-                            <div class="bet-number">${displayNum}</div>
-                            <div class="bet-amount">${amount.toString()}</div>
-                        </div>
-                    `;
-                });
-            } else if (slip.numbers && slip.numbers.length > 0) {
-                // Fallback display EXACTLY as in slip.html
-                const estimatedAmount = slip.total_amount / slip.numbers.length;
-                slip.numbers.forEach(num => {
-                    const displayNum = formatNumber(num);
-                    
-                    betRows += `
-                        <div class="bet-row">
-                            <div class="bet-number">${displayNum}</div>
-                            <div class="bet-amount">${Math.round(estimatedAmount).toString()}</div>
-                        </div>
-                    `;
-                });
-            }
-            
-            return `
-                <div class="slip-item" data-slip-id="${slip.id}">
-                    <div class="slip-header">
-                        <div class="slip-number">${slipNumber}</div>
-                        <div class="user-name">${userName}</div>
-                        <div class="slip-total">${slipTotal.toString()}</div>
-                    </div>
-                    <div class="bet-items">
-                        ${betRows}
-                        <div class="item-total">
-                            Total = ${slipTotal.toString()}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-        
-        // Function to display data
-        function displayData(data) {
-            if (data.length === 0) {
-                dataSection.innerHTML = `
-                    <div class="no-results">
-                        ${searchNumber ? 
-                            'Number ' + formatNumber(searchNumber) + ' နှင့် ကိုက်ညီသော လောင်းကြေးမရှိပါ' : 
-                            'လောင်းကြေးများ မရှိသေးပါ'
-                        }
-                    </div>
-                `;
-                grandTotal.textContent = '0';
-                return;
-            }
-            
-            // Sort data by created_at (newest first) EXACTLY as in slip.html
-            const sortedData = [...data].sort((a, b) => {
-                const dateA = new Date(a.created_at || a.timestamp || 0);
-                const dateB = new Date(b.created_at || b.timestamp || 0);
-                return dateB - dateA; // Newest first
-            });
-            
-            let dataHtml = '';
-            
-            // Create slip items
-            sortedData.forEach((slip, index) => {
-                dataHtml += createSlipItem(slip, index, sortedData.length);
-            });
-            
-            dataSection.innerHTML = dataHtml;
-            
-            // Update grand total
-            const total = calculateGrandTotal(sortedData);
-            grandTotal.textContent = total.toString();
-            
-            // Update search status
-            if (searchNumber) {
-                const matchingCount = data.length;
-                const matchingTotal = total;
-                searchStatus.innerHTML = `
-                    Number <strong>${formatNumber(searchNumber)}</strong> နှင့် 
-                    <strong>${matchingCount}</strong> ဦး ကိုက်ညီသည် | 
-                    Total: <strong>${matchingTotal.toString()}</strong>
-                `;
-            } else {
-                searchStatus.textContent = 'အားလုံး ပြသထားသည်';
-            }
-        }
-        
-        // Function to load saved bets from Supabase EXACTLY as in slip.html
+
+        // Function to load saved bets from Supabase (EXACTLY as slip.html logic)
         async function loadSavedBets() {
             const params = getUrlParams();
             
-            // Get current time from URL parameters EXACTLY as in slip.html
+            // Get current time from URL parameters (EXACTLY as slip.html)
             if (params.date && params.time) {
                 currentKey = `${params.date} ${params.time}`;
                 activeTimeDisplay.textContent = currentKey;
@@ -633,7 +444,7 @@
                 currentKey = params.key;
                 activeTimeDisplay.textContent = currentKey;
             } else {
-                // Try to get from localStorage or default EXACTLY as in slip.html
+                // Try to get from localStorage or default (EXACTLY as slip.html)
                 const storedDate = localStorage.getItem('selectedDate');
                 const storedTime = localStorage.getItem('selectedTime');
                 if (storedDate && storedTime) {
@@ -641,20 +452,21 @@
                     activeTimeDisplay.textContent = currentKey;
                 } else {
                     activeTimeDisplay.textContent = 'No Active Time Selected';
-                    loadingContainer.innerHTML = '<div class="error-message">အချိန်မရွေးထားပါ</div>';
+                    showMessage('အချိန်မရွေးထားပါ', 'error');
                     return;
                 }
             }
             
-            // Show loading state
-            loadingContainer.style.display = 'block';
-            loadingContainer.innerHTML = `
-                <div class="spinner"></div>
-                <div class="loading-text">လောင်းကြေးများ လာရောက်နေသည်...</div>
-            `;
+            // Check if Supabase is initialized (EXACTLY as slip.html)
+            if (!supabase) {
+                if (!initSupabase()) {
+                    showMessage('Database connection failed. Please refresh.', 'error');
+                    return;
+                }
+            }
             
             try {
-                // Get data from Supabase EXACTLY as in slip.html
+                // Get data from Supabase (EXACTLY as slip.html query)
                 const { data, error } = await supabase
                     .from('sales')
                     .select('*')
@@ -668,140 +480,300 @@
                 
                 allSalesData = data || [];
                 
-                // Apply search filter if any
-                filteredSalesData = filterDataByNumber(allSalesData, searchNumber);
-                
-                // Hide loading and display data
-                loadingContainer.style.display = 'none';
-                displayData(filteredSalesData);
-                
-            } catch (error) {
-                console.error('Error loading slips:', error);
-                loadingContainer.innerHTML = `<div class="error-message">လောင်းကြေးများရယူရာတွင်အမှားတစ်ခုဖြစ်နေသည်</div>`;
-                
-                // Fallback to localStorage if available EXACTLY as in slip.html
-                try {
-                    const savedData = JSON.parse(localStorage.getItem(currentKey));
-                    if (savedData && savedData.length > 0) {
-                        console.log('Using localStorage fallback');
-                        allSalesData = savedData;
-                        filteredSalesData = filterDataByNumber(allSalesData, searchNumber);
-                        displayData(filteredSalesData);
-                        showMessage('⚠️ LocalStorage မှဒေတာကိုအသုံးပြုထားသည်', 'error');
-                    }
-                } catch (fallbackError) {
-                    console.error('Fallback also failed:', fallbackError);
-                }
-            }
-        }
-        
-        // Function to setup real-time updates EXACTLY as in slip.html
-        function setupRealTimeUpdates() {
-            if (!supabase || !currentKey) return;
-            
-            supabase
-                .channel('slipview-updates')
-                .on('postgres_changes', 
-                    { 
-                        event: '*', 
-                        schema: 'public', 
-                        table: 'sales',
-                        filter: `key=eq.${currentKey}`
-                    },
-                    (payload) => {
-                        console.log('Real-time update:', payload);
-                        loadSavedBets();
-                    }
-                )
-                .subscribe();
-        }
-        
-        // Event Listeners
-        searchInput.addEventListener('input', function(e) {
-            const value = e.target.value.trim();
-            
-            // Validate input (00-99)
-            if (value) {
-                const num = parseInt(value);
-                if (isNaN(num) || num < 0 || num > 99) {
-                    showMessage('Please enter number between 00-99', 'error');
-                    this.value = '';
-                    searchNumber = '';
-                    filteredSalesData = allSalesData;
-                    displayData(filteredSalesData);
+                if (allSalesData.length === 0) {
+                    loadingContainer.innerHTML = '<div class="empty-message">ဘောင်ချာများမရှိသေးပါ</div>';
+                    grandTotal.textContent = '0';
                     return;
                 }
                 
-                // Ensure 2-digit format
-                if (value.length > 2) {
-                    this.value = value.slice(0, 2);
+                // Apply search filter if any
+                filteredSalesData = filterDataByNumber(allSalesData, searchNumber);
+                
+                // Display the slips
+                displaySlips(filteredSalesData);
+                
+            } catch (error) {
+                console.error('Error loading slips:', error);
+                loadingContainer.innerHTML = '<div class="error-message">လောင်းကြေးများရယူရာတွင်အမှားတစ်ခုဖြစ်နေသည်</div>';
+            }
+        }
+
+        // Function to filter data by search number
+        function filterDataByNumber(data, searchNum) {
+            if (!searchNum || searchNum === '') {
+                return data;
+            }
+            
+            const filteredData = [];
+            const searchNumInt = parseInt(searchNum);
+            
+            data.forEach(slip => {
+                // Check if this slip has the searched number (EXACTLY as slip.html format)
+                let hasMatchingBets = false;
+                const matchingBets = [];
+                
+                if (slip.bets && slip.bets.length > 0) {
+                    slip.bets.forEach(bet => {
+                        const betNumber = bet.display || bet.num || bet.number;
+                        if (parseInt(betNumber) === searchNumInt) {
+                            hasMatchingBets = true;
+                            matchingBets.push(bet);
+                        }
+                    });
+                } else if (slip.numbers && slip.numbers.length > 0) {
+                    // Fallback to numbers array (EXACTLY as slip.html)
+                    slip.numbers.forEach(num => {
+                        if (parseInt(num) === searchNumInt) {
+                            hasMatchingBets = true;
+                            // Estimate amount if not available
+                            const estimatedAmount = slip.total_amount / slip.numbers.length;
+                            matchingBets.push({
+                                display: formatNumber(num),
+                                num: num,
+                                amount: Math.round(estimatedAmount)
+                            });
+                        }
+                    });
                 }
                 
-                searchNumber = this.value;
+                if (hasMatchingBets) {
+                    // Create a copy of the slip with only matching bets
+                    const filteredSlip = {
+                        ...slip,
+                        bets: matchingBets,
+                        total_amount: matchingBets.reduce((sum, bet) => sum + (bet.amount || 0), 0)
+                    };
+                    filteredData.push(filteredSlip);
+                }
+            });
+            
+            return filteredData;
+        }
+
+        // Function to calculate grand total
+        function calculateGrandTotal(data) {
+            return data.reduce((total, slip) => total + (slip.total_amount || 0), 0);
+        }
+
+        // Function to display slips (EXACTLY as slip.html sorting logic)
+        function displaySlips(slipsData) {
+            loadingContainer.style.display = 'none';
+            dataSection.innerHTML = '';
+            
+            if (slipsData.length === 0) {
+                dataSection.innerHTML = `
+                    <div class="no-results">
+                        ${searchNumber ? 
+                            'Number ' + formatNumber(searchNumber) + ' နှင့် ကိုက်ညီသော လောင်းကြေးမရှိပါ' : 
+                            'လောင်းကြေးများ မရှိသေးပါ'
+                        }
+                    </div>
+                `;
+                grandTotal.textContent = '0';
+                return;
+            }
+            
+            // First, sort the data by created_at (newest first) - EXACTLY as slip.html
+            const sortedData = [...slipsData].sort((a, b) => {
+                const dateA = new Date(a.created_at || a.timestamp || 0);
+                const dateB = new Date(b.created_at || b.timestamp || 0);
+                return dateB - dateA; // Newest first
+            });
+            
+            let allSlipsHtml = '';
+            
+            // Create slip items (EXACTLY as requested format)
+            sortedData.forEach((slip, index) => {
+                // Slip number: newest (first in sorted array) gets highest number
+                const slipNumber = sortedData.length - index;
+                const userName = slip.name || 'No Name';
+                const slipTotal = slip.total_amount || slip.total || 0;
+                
+                let betRows = '';
+                if (slip.bets && slip.bets.length > 0) {
+                    slip.bets.forEach(bet => {
+                        const displayNum = formatNumber(bet.display || bet.num || bet.number);
+                        const amount = bet.amount || 0;
+                        
+                        betRows += `
+                            <div class="bet-row">
+                                <div class="bet-number">${displayNum}</div>
+                                <div class="bet-amount">${amount.toString()}</div>
+                            </div>
+                        `;
+                    });
+                } else if (slip.numbers && slip.numbers.length > 0) {
+                    // Fallback display (EXACTLY as slip.html)
+                    slip.numbers.forEach(num => {
+                        const estimatedAmount = slip.total_amount / slip.numbers.length;
+                        const displayNum = formatNumber(num);
+                        
+                        betRows += `
+                            <div class="bet-row">
+                                <div class="bet-number">${displayNum}</div>
+                                <div class="bet-amount">${Math.round(estimatedAmount).toString()}</div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                const slipHtml = `
+                    <div class="slip-item">
+                        <div class="slip-header">
+                            <div class="slip-number">${slipNumber}</div>
+                            <div class="user-name">${userName}</div>
+                            <div class="slip-total">${slipTotal.toString()}</div>
+                        </div>
+                        <div class="bet-items">
+                            ${betRows}
+                            <div class="item-total">
+                                Total = ${slipTotal.toString()}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                allSlipsHtml += slipHtml;
+            });
+            
+            dataSection.innerHTML = allSlipsHtml;
+            
+            // Update grand total
+            const total = calculateGrandTotal(slipsData);
+            grandTotal.textContent = total.toString();
+            
+            // Update search status
+            if (searchNumber) {
+                const matchingCount = slipsData.length;
+                const matchingTotal = total;
+                searchStatus.innerHTML = `
+                    Number <strong>${formatNumber(searchNumber)}</strong> နှင့် 
+                    <strong>${matchingCount}</strong> ဦး ကိုက်ညီသည် | 
+                    Total: <strong>${matchingTotal.toString()}</strong>
+                `;
             } else {
+                searchStatus.textContent = 'အားလုံး ပြသထားသည်';
+            }
+        }
+
+        // Event Listeners
+        searchInput.addEventListener('input', function(e) {
+            searchNumber = e.target.value.trim();
+            
+            // Validate input (00-99)
+            if (searchNumber && (parseInt(searchNumber) < 0 || parseInt(searchNumber) > 99)) {
+                searchInput.value = '';
                 searchNumber = '';
+                searchStatus.textContent = 'Please enter number between 00-99';
+                return;
             }
             
             // Apply filter
             filteredSalesData = filterDataByNumber(allSalesData, searchNumber);
-            displayData(filteredSalesData);
+            displaySlips(filteredSalesData);
+        });
+        
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchNumber = this.value.trim();
+                filteredSalesData = filterDataByNumber(allSalesData, searchNumber);
+                displaySlips(filteredSalesData);
+            }
         });
         
         clearBtn.addEventListener('click', function() {
             searchInput.value = '';
             searchNumber = '';
             filteredSalesData = allSalesData;
-            displayData(filteredSalesData);
-            searchStatus.textContent = 'အားလုံး ပြသထားသည်';
+            displaySlips(filteredSalesData);
         });
-        
-        // Initialize on page load EXACTLY as in slip.html
+
+        // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             if (initSupabase()) {
                 loadSavedBets();
-                setupRealTimeUpdates();
             }
-            
-            // Auto-refresh every 30 seconds EXACTLY as in slip.html
-            setInterval(() => {
-                if (supabase) {
-                    loadSavedBets();
-                }
-            }, 30000);
         });
-        
-        // Keyboard shortcuts EXACTLY as in slip.html
+
+        // Keyboard shortcuts (EXACTLY as slip.html style)
         document.addEventListener('keydown', function(e) {
-            // Escape to clear search
             if (e.key === 'Escape') {
+                // Clear search
                 searchInput.value = '';
                 searchNumber = '';
                 filteredSalesData = allSalesData;
-                displayData(filteredSalesData);
-                searchInput.focus();
-            }
-            // F5 to refresh
-            if (e.key === 'F5') {
-                e.preventDefault();
-                loadSavedBets();
-            }
-            // Ctrl+R to refresh
-            if (e.ctrlKey && e.key === 'r') {
-                e.preventDefault();
-                loadSavedBets();
-            }
-            // Escape to go back to slip.html
-            if (e.key === 'Escape' && !searchInput.value) {
-                const params = getUrlParams();
-                if (params.date && params.time) {
-                    window.location.href = `slip.html?date=${encodeURIComponent(params.date)}&time=${encodeURIComponent(params.time)}`;
-                } else if (params.key) {
-                    window.location.href = `slip.html?key=${encodeURIComponent(params.key)}`;
-                } else {
-                    window.location.href = "slip.html";
-                }
+                displaySlips(filteredSalesData);
             }
         });
+    </script>
+
+    <!-- Script 3: External Script File (slipview-helper.js combined) -->
+    <script>
+        // slipview-helper.js functionality
+        // Helper functions for slipview.html
+        
+        // Function to show notification message
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 10px 20px;
+                border-radius: 5px;
+                background: ${type === 'error' ? '#e74c3c' : type === 'success' ? '#2ecc71' : '#3498db'};
+                color: white;
+                z-index: 1000;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                font-family: 'Pyidaungsu', sans-serif;
+                animation: slideDown 0.3s ease-out;
+            `;
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    document.body.removeChild(notification);
+                }
+            }, 3000);
+        }
+
+        // Function to format date in Burmese style
+        function formatBurmeseDate(dateString) {
+            try {
+                const date = new Date(dateString);
+                const day = date.getDate();
+                const month = date.getMonth() + 1;
+                const year = date.getFullYear();
+                const hours = date.getHours();
+                const minutes = date.getMinutes();
+                
+                return `${day}/${month}/${year} ${hours}:${minutes}`;
+            } catch (e) {
+                return 'Invalid Date';
+            }
+        }
+
+        // Add CSS for animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideDown {
+                from {
+                    opacity: 0;
+                    transform: translateX(-50%) translateY(-20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(-50%) translateY(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        console.log('slipview-helper.js functionality loaded');
     </script>
 </body>
 </html>
