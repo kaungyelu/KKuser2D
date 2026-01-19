@@ -78,7 +78,9 @@ function normalizeReverseText(text) {
         'ပါဝါ': [5, 16, 27, 38, 49, 50, 61, 72, 83, 94],
         'နက္ခ': [7, 18, 24, 35, 42, 53, 69, 70, 81, 96],
         'ညီကို': [1, 12, 23, 34, 45, 56, 67, 78, 89, 90],
-        'ကိုညီ': [9, 10, 21, 32, 43, 54, 65, 76, 87, 98]
+        'ကိုညီ': [9, 10, 21, 32, 43, 54, 65, 76, 87, 98],
+       'စုံပူး': [0, 22, 44, 66, 88],       
+    'မပူး': [11, 33, 55, 77, 99]
     };
 
     // Even/Odd system
@@ -397,6 +399,8 @@ function showBetConfirmationDialog(preparedBets, invalidLines, invalidText) {
     // Function to parse a single line of bet input
     function parseBetLine(line) {
         const bets = [];
+         const kaatBets = parseKaatBet(line);
+    if (kaatBets.length > 0) return kaatBets;
         
         // 1. Check for dynamic types with reverse (ထိပ်, ပိတ်)
              const dynamicTypes = ['ထိပ်', 'ပိတ်', 'ဘရိတ်', 'ပါ'];
@@ -789,6 +793,177 @@ function showBetConfirmationDialog(preparedBets, invalidLines, invalidText) {
         
         return bets;
     }
+
+   
+
+// NEW FUNCTION: Parse ကပ် bet (combination system)
+function parseKaatBet(line) {
+    const bets = [];
+    
+    // ပုံစံအားလုံးကိုဖမ်းမယ့် regex pattern
+    // 1234ကို5678ကပ်1000 (rR@& မပါ)
+    // 1234ကို5678ကပ်R1000 (rR@& တစ်ခုခုပါ)
+    // 1234ကို5678ကပ်1000r500 (rR@& ပါ၊ ငွေနှစ်ခု - r နောက်မှာ)
+    // 1234ကို5678ကပ်R1000-500 (rR@& ပါ၊ ငွေနှစ်ခု - dash နဲ့)
+    
+    // rR@& ပါမပါစစ်ဖို့ pattern
+    const hasReverseChar = /[rR@&]/.test(line);
+    
+    if (!hasReverseChar) {
+        // rR@& မပါရင် - ပုံစံ: 1234ကို5678ကပ်1000
+        const patternNoReverse = line.match(/^(\d+)ကို(\d+)ကပ်(\d+)$/);
+        if (patternNoReverse) {
+            const [, firstDigitsStr, secondDigitsStr, amountStr] = patternNoReverse;
+            const amount = parseInt(amountStr);
+            
+            if (amount >= 100) {
+                return generateBaseCombinations(firstDigitsStr, secondDigitsStr, amount, false, null);
+            }
+        }
+    } else {
+        // rR@& ပါရင်
+        // ပုံစံ 1: 1234ကို5678ကပ်R1000 (ငွေတစ်ခုတည်း)
+        const patternSingle = line.match(/^(\d+)ကို(\d+)ကပ်[rR@&](\d+)$/);
+        if (patternSingle) {
+            const [, firstDigitsStr, secondDigitsStr, amountStr] = patternSingle;
+            const amount = parseInt(amountStr);
+            
+            if (amount >= 100) {
+                return generateBaseCombinations(firstDigitsStr, secondDigitsStr, amount, true, null);
+            }
+        }
+        
+        // ပုံစံ 2: 1234ကို5678ကပ်R1000-500 (dash နဲ့ ငွေနှစ်ခု)
+        const patternDash = line.match(/^(\d+)ကို(\d+)ကပ်[rR@&](\d+)[\-\s]+(\d+)$/);
+        if (patternDash) {
+            const [, firstDigitsStr, secondDigitsStr, amount1Str, amount2Str] = patternDash;
+            const amount1 = parseInt(amount1Str);
+            const amount2 = parseInt(amount2Str);
+            
+            if (amount1 >= 100 && amount2 >= 100) {
+                return generateBaseCombinations(firstDigitsStr, secondDigitsStr, amount1, true, amount2);
+            }
+        }
+        
+        // ပုံစံ 3: 1234ကို5678ကပ်1000r500 (r နောက်မှာ ငွေဒုတိယတစ်ခု)
+        const patternAfterR = line.match(/^(\d+)ကို(\d+)ကပ်(\d+)[rR@&](\d+)$/);
+        if (patternAfterR) {
+            const [, firstDigitsStr, secondDigitsStr, amount1Str, amount2Str] = patternAfterR;
+            const amount1 = parseInt(amount1Str);
+            const amount2 = parseInt(amount2Str);
+            
+            if (amount1 >= 100 && amount2 >= 100) {
+                return generateBaseCombinations(firstDigitsStr, secondDigitsStr, amount1, true, amount2);
+            }
+        }
+        
+        // ပုံစံ 4: 1234ကို5678ကပ်R1000r500 (rR@& နှစ်ခုပါ - ရှားတယ်)
+        const patternBoth = line.match(/^(\d+)ကို(\d+)ကပ်[rR@&](\d+)[rR@&](\d+)$/);
+        if (patternBoth) {
+            const [, firstDigitsStr, secondDigitsStr, amount1Str, amount2Str] = patternBoth;
+            const amount1 = parseInt(amount1Str);
+            const amount2 = parseInt(amount2Str);
+            
+            if (amount1 >= 100 && amount2 >= 100) {
+                return generateBaseCombinations(firstDigitsStr, secondDigitsStr, amount1, true, amount2);
+            }
+        }
+    }
+    
+    return bets;
+}
+
+// Helper function to generate combinations
+function generateBaseCombinations(firstDigitsStr, secondDigitsStr, amount1, includeReverse = false, amount2 = null) {
+    const bets = [];
+    const firstDigits = firstDigitsStr.split('').map(d => parseInt(d));
+    const secondDigits = secondDigitsStr.split('').map(d => parseInt(d));
+    
+    // Base combinations ဖန်တီးမယ်
+    const baseCombinations = [];
+    for (const first of firstDigits) {
+        for (const second of secondDigits) {
+            const num = first * 10 + second;
+            if (!baseCombinations.includes(num)) {
+                baseCombinations.push(num);
+            }
+        }
+    }
+    
+    // rR@& မပါရင် base combinations ကိုပဲ
+    if (!includeReverse) {
+        baseCombinations.forEach(num => {
+            bets.push({
+                number: num,
+                amount: amount1,
+                display: num.toString().padStart(2, '0'),
+                type: 'ကပ်'
+            });
+        });
+    } else {
+        // rR@& ပါရင်
+        // Reverse numbers တွေကိုလည်း ထည့်မယ်
+        const allNumbers = [...baseCombinations];
+        const reverseNumbers = [];
+        
+        baseCombinations.forEach(num => {
+            const revNum = parseInt(num.toString().split('').reverse().join(''));
+            if (!reverseNumbers.includes(revNum)) {
+                reverseNumbers.push(revNum);
+            }
+        });
+        
+        // ငွေတစ်ခုတည်းပါရင် (amount2 မပါရင်)
+        if (amount2 === null) {
+            // Base numbers
+            baseCombinations.forEach(num => {
+                bets.push({
+                    number: num,
+                    amount: amount1,
+                    display: num.toString().padStart(2, '0'),
+                    type: 'ကပ်R'
+                });
+            });
+            
+            // Reverse numbers (base နဲ့မတူတဲ့ဟာတွေပဲ)
+            reverseNumbers.forEach(num => {
+                if (!baseCombinations.includes(num)) {
+                    bets.push({
+                        number: num,
+                        amount: amount1,
+                        display: num.toString().padStart(2, '0'),
+                        type: 'ကပ်R'
+                    });
+                }
+            });
+        } else {
+            // ငွေနှစ်ခုပါရင်
+            // Base numbers ကို ပထမငွေနဲ့
+            baseCombinations.forEach(num => {
+                bets.push({
+                    number: num,
+                    amount: amount1,
+                    display: num.toString().padStart(2, '0'),
+                    type: 'ကပ်R'
+                });
+            });
+            
+            // Reverse numbers ကို ဒုတိယငွေနဲ့
+            reverseNumbers.forEach(num => {
+                bets.push({
+                    number: num,
+                    amount: amount2,
+                    display: num.toString().padStart(2, '0'),
+                    type: 'ကပ်R'
+                });
+            });
+        }
+    }
+    
+    return bets;
+}
+
+
 
     // Parse wheel bet (ခွေ, ခွေပူး)
     function parseWheelBet(line) {
