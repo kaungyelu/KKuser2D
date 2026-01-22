@@ -61,7 +61,7 @@ function normalizeAllSpecialText(text) {
     text = text.replace(/(ကိုညီ|ကည|ကြီးသေး)/gi, 'ကိုညီ');
        // ထိပ်ပိတ်အမျိုးမျိုး
     
-text = text.replace(/(ထိပ်ပိတ်|ထိပ်ပိက်|ထိပ်r|ပိတ်r|ပိတ်ထိပ်|ထိပ်နေါက်|ထိပ်နောက်)/gi, 'ထိပ်ပိတ်');
+text = text.replace(/(ထိပ်ပိတ်|ထိပ်ပိက်|ထိပ်r|ပိတ်r|ပိတ်ထိပ်|ထိပ်နေါက်|ထိပ်နေက်)/gi, 'ထိပ်ပိတ်');
 
     return text;
 }
