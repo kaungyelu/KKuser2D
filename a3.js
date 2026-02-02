@@ -72,7 +72,7 @@ function normalizeReverseText(text) {
     text = myanmarToArabic(text);
     
     // Reverse အတွက်
-    let normalized = text.replace(/[rR@&အာ]/g, 'r');
+    let normalized = text.replace(/[rR@&]/g, 'r');
     
     // ဘရိတ်အတွက်
     normalized = normalized.replace(/(ဘရိတ်|ဘ|ဘီ|Bk|bk|B|b)/gi, 'ဘရိတ်');
@@ -415,6 +415,7 @@ function addPreparedBets() {
 }// Function to parse a single line of bet input
 function parseBetLine(line) {
     const bets = [];
+      line = myanmarToArabic(line);
     const kaatBets = parseKaatBet(line);
     if (kaatBets.length > 0) return kaatBets;
      
